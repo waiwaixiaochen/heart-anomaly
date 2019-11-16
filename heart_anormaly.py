@@ -1,0 +1,137 @@
+import csv
+import numpy as np 
+import math
+from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+from sklearn.metrics import confusion_matrics
+
+# preprocess the basic data for the learners
+def prepare_basic_data(train_y, train_row_num, train_x):
+    train_y_list = list(train_y)
+    count1 = train_y_list.count(1)
+    count0 = train_row_num - count1
+    p_normal = float(count1)/float(train_row_num)
+    p_abnormal = 1-p_normal
+
+    # get the row numbers of normal instances
+    ind = [i for i, x in enumerate(train_y_list) if x==1]
+
+    # create a new data set for normal instances
+    train_normal = train_x[ind, :]
+    # delete the first column
+    train_normal = np.delete(train_normal,0,1)
+    train_normal = np.array(train_normal)
+
+    # create a new data set for abnormal instances
+    train_abnormal = np.delete(train_x, ind, 0)
+    # delete the first column for the abnormal instances
+    train_abnormal = np.delete(train_abnormal, 0, 1)
+    train_abnormal = np.array(train_abnormal)
+
+    return p_normal, p_abnormal, train_normal, train_abnormal, count1, count0
+
+
+# preprocess the data for Naive Bayesian Learning
+def prepare_data_naive(p_normal, train_normal, count1):
+    
+    # create four lists to record the probabilities
+    # one list for p(xi=1|normal), one list for p(xi=0|normal)
+    # one list for p(xi=1|abnormal), one list for p(xi=0|abnormal)
+    p1_normal = list()
+    p0_normal = list()
+    #p1_abnormal = list()
+    #p0_abnormal = list()
+
+    feature_num = np.size(train_normal, 1)
+    for i in range(0,feature_num):
+        feature = train_normal[:, i] 
+        feature = train_y.astype(int)
+        feature_list = list(feature)
+        count_feature_1 = feature_list.count(1)
+        count_feature_0 = count1 - count_feature_1 
+        
+        p_feature_1 = float(count_feature_1) / float(count1) + 0.5
+        p_feature_1 = math.log(p_feature_1)
+        p1_normal = p1_normal.append(p_feature_1)
+        
+        p_feature_0 = float(count_feature_0) / float(count1) + 0.5
+        p_feature_0 = math.log(p_feature_0)
+        p0_normal = p0_normal.append(p_feature_0)
+    return p1_normal, p0_normal
+"""
+    feature_num1 = np.size(train_abnormal, 1)
+    for i in range(0,feature_num1):
+        feature = train_normal[:, i] 
+        feature = train_y.astype(int)
+        feature_list = list(feature)
+        count_feature_1 = feature_list.count(1)
+        count_feature_0 = count1 - count_feature_1 
+        
+        p_feature_1 = float(count_feature_1) / float(count1) + 0.5
+        p_feature_1 = log(p_feature_1)
+        p1_normal = p1_normal.append(p_feature_1)
+        
+        p_feature_0 = float(count_feature_0) / float(count1) + 0.5
+        p_feature_0 = log(p_feature_0)
+        p0_normal = p0_normal.append(p_feature_0)
+"""
+
+
+
+# create and initialize csv files' row number anf input list
+train_row_num = 0
+test_row_num = 0
+train_x = list()
+test_x = list()
+count = 0
+train_file_name = "spect-orig.train.csv"
+# read from csv train files
+with open(train_file_name, 'r') as train_file:
+    train_reader = csv.reader(train_file)
+    for row in train_reader:
+        train_row_num += 1
+        train_x.append(row)
+train_x = np.array(train_x)
+
+# labels of the train data
+train_y = train_x[:, 0]
+train_y = train_y.astype(int)
+
+# read from csv test files
+test_file_name = "spect-orig.test.csv"
+with open(test_file_name, 'r') as test_file:
+    test_reader = csv.reader(test_file)
+    for row in test_reader:
+        test_row_num += 1
+        test_x.append(row)
+test_x = np.array(test_x)
+
+# labels of the test data
+test_y = test_x[:, 0]
+test_y = test_y.astype(int)
+test_x_new = np.delete(test_x,0,1)
+test_x_new = np.array(test_x_new)
+test_x_new = test_x_new.astype(np.float)
+
+feature_num = np.size(train_normal, 1)
+num_row = np.shape()[0]
+# First learner: Naive Bayesian Learner
+p_normal, p_abnormal, train_normal, train_abnormal, count1, count0 = prepare_basic_data(train_y, train_row_num, train_x)
+p1_normal, p0_normal = prepare_data_naive(p_normal, train_normal, count1)
+p1_abnormal, p0_abnormal = prepare_data_naive(p_abnormal, train_abnormal, count0)
+
+p1 = p_normal
+p0 = p_abnormal
+
+for n in 
+for i in range(0,feature_num):
+    if test_x_new[i] == 1:
+        p1 += p1_normal[i]
+        p0 += p1_abnormal[i]
+    if test_x_new[i] == 0:
+        p1 += p0_normal[i]
+        p0 += p0_abnormal[i]
+if p1 > p0:
+
