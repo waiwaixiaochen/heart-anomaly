@@ -164,4 +164,4 @@ for i in range(0, test_row_num):
 accuracy = float(count_correct)/float(test_row_num)
 true_negative = float(true_abnormal)/float(count_abnormal)
 true_positive = float(true_normal)/float(count_normal)
-print('{}/{}({}) {}/{}({}) {}/{}({})'.format(count_correct, test_row_num, accuracy,true_abnormal,count_abnormal, true_negtive, true_normal, count_normal, true_positive)
+print('{}/{}({}) {}/{}({}) {}/{}({})'.format(count_correct, test_row_num, accuracy,true_abnormal,count_abnormal, true_negtive, true_normal, count_normal, true_positive))
