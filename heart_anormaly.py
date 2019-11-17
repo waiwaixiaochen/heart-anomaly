@@ -41,6 +41,8 @@ def prepare_data_naive(p_normal, train_normal, count1):
     # one list for p(xi=1|abnormal), one list for p(xi=0|abnormal)
     p1_normal = list()
     p0_normal = list()
+    p1_normal = np.array(p1_normal)
+    p0_normal = np.array(p0_normal)
     #p1_abnormal = list()
     #p0_abnormal = list()
 
@@ -49,15 +51,16 @@ def prepare_data_naive(p_normal, train_normal, count1):
         feature = train_normal[:, i] 
         feature = train_y.astype(int)
         feature_list = list(feature)
+        feture_list = np.array(feature_list)
         count_feature_1 = feature_list.count(1)
         count_feature_0 = count1 - count_feature_1 
         
         p_feature_1 = float(count_feature_1) / float(count1) + 0.5
-        p_feature_1 = math.log(p_feature_1)
+        p_feature_1 = np.log(p_feature_1)
         p1_normal = p1_normal.append(p_feature_1)
         
         p_feature_0 = float(count_feature_0) / float(count1) + 0.5
-        p_feature_0 = math.log(p_feature_0)
+        p_feature_0 = np.log(p_feature_0)
         p0_normal = p0_normal.append(p_feature_0)
     return p1_normal, p0_normal
 """
@@ -115,23 +118,50 @@ test_x_new = np.delete(test_x,0,1)
 test_x_new = np.array(test_x_new)
 test_x_new = test_x_new.astype(np.float)
 
-feature_num = np.size(train_normal, 1)
-num_row = np.shape()[0]
+
+#num_row = np.shape()[0]
+
 # First learner: Naive Bayesian Learner
 p_normal, p_abnormal, train_normal, train_abnormal, count1, count0 = prepare_basic_data(train_y, train_row_num, train_x)
 p1_normal, p0_normal = prepare_data_naive(p_normal, train_normal, count1)
 p1_abnormal, p0_abnormal = prepare_data_naive(p_abnormal, train_abnormal, count0)
 
-p1 = p_normal
-p0 = p_abnormal
+feature_num = np.size(train_normal, 1)
+p1 = np.log(p_normal)
+p0 = np.log(p_abnormal)
 
-for n in 
-for i in range(0,feature_num):
-    if test_x_new[i] == 1:
-        p1 += p1_normal[i]
-        p0 += p1_abnormal[i]
-    if test_x_new[i] == 0:
-        p1 += p0_normal[i]
-        p0 += p0_abnormal[i]
-if p1 > p0:
+count_normal = 0
+count_abnormal = 0
+count_correct = 0
+true_normal = 0
+true_abnormal = 0
+predicted = list()
 
+for i in range(0, test_row_num): 
+    for j in range(0,feature_num):
+        if test_x_new[i][j] == 1:
+            p1 += p1_normal[j]
+            p0 += p1_abnormal[j]
+        if test_x_new[i][j] == 0:
+            p1 += p0_normal[j]
+            p0 += p0_abnormal[j]
+    if p1 > p0:
+        count_normal += 1
+        predicted.append(1)
+    else:
+        count_abnormal += 1
+        predicted.append(0)
+predicted = np.array(predicted)
+
+for i in range(0, test_row_num):
+    if predicted[i] == test_y[i]:
+        count_correct += 1
+    if predicted[i] == 0 and test_y[i] == 0:
+        true_abnormal += 1
+    if predicted[i] == 1 and test_y[i] == 1:
+        true_normal += 1
+
+accuracy = float(count_correct)/float(test_row_num)
+true_negative = float(true_abnormal)/float(count_abnormal)
+true_positive = float(true_normal)/float(count_normal)
+print('{}/{}({}) {}/{}({}) {}/{}({})'.format(count_correct, test_row_num, accuracy,true_abnormal,count_abnormal, true_negtive, true_normal, count_normal, true_positive)
