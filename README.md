@@ -30,6 +30,7 @@ $ python heart_anomaly.py
                 
 
 ## Results
+Note: Results order-the accuracy on all the instances, true negative rate, and true positive rate
 
 - Naive Bayesian Learner:
   - orig 142/187(0.76) 10/15(0.67) 132/172(0.77)
