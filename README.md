@@ -37,7 +37,7 @@ $ python heart_anomaly.py
   - itg 145/187(0.78) 15/15(1.00) 130/172(0.76)
   - resplit-itg 63/90(0.70) 17/19(0.89) 46/71(0.65)
 
--Gaussian Naive Bayes Learner:
+- Gaussian Naive Bayes Learner:
   - orig 112/187(0.60) 12/15(0.80) 100/172(0.58)
   - resplit 54/90(0.60) 19/19(1.00) 35/71(0.49)
   - itg 132/187(0.71) 14/15(0.93) 118/172(0.69)
