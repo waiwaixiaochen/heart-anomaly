@@ -66,93 +66,101 @@ def prepare_data_naive(p_normal, train_normal, count1):
         p0_normal = np.append(p0_normal, p_feature_0)
     return p1_normal, p0_normal
 
-# create and initialize csv files' row number anf input list
-train_row_num = 0
-test_row_num = 0
-train_x = list()
-test_x = list()
-count = 0
-train_file_name = "spect-orig.train.csv"
-# read from csv train files
-with open(train_file_name, 'r') as train_file:
-    train_reader = csv.reader(train_file)
-    for row in train_reader:
-        train_row_num += 1
-        train_x.append(row)
-train_x = np.array(train_x)
+def load_data(train_file_name, test_file_name):
+    # create and initialize csv files' row number anf input list
+    train_row_num = 0
+    test_row_num = 0
+    train_x = list()
+    test_x = list()
+    count = 0
+    #train_file_name = "spect-orig.train.csv"
+    # read from csv train files
+    with open(train_file_name, 'r') as train_file:
+        train_reader = csv.reader(train_file)
+        for row in train_reader:
+            train_row_num += 1
+            train_x.append(row)
+    train_x = np.array(train_x)
 
-# labels of the train data
-train_y = train_x[:, 0]
-train_y = train_y.astype(int)
+    # labels of the train data
+    train_y = train_x[:, 0]
+    train_y = train_y.astype(int)
 
-# read from csv test files
-test_file_name = "spect-orig.test.csv"
-with open(test_file_name, 'r') as test_file:
-    test_reader = csv.reader(test_file)
-    for row in test_reader:
-        test_row_num += 1
-        test_x.append(row)
-test_x = np.array(test_x)
+    # read from csv test files
+    #test_file_name = "spect-orig.test.csv"
+    with open(test_file_name, 'r') as test_file:
+        test_reader = csv.reader(test_file)
+        for row in test_reader:
+            test_row_num += 1
+            test_x.append(row)
+    test_x = np.array(test_x)
 
-# labels of the test data
-test_y = test_x[:, 0]
-test_y = test_y.astype(int)
-test_list = list(test_y)
-count_test_normal = test_list.count(1)
-count_test_abnormal = test_row_num - count_test_normal
-#print(test_y)
-test_x_new = np.delete(test_x,0,1)
-test_x_new = np.array(test_x_new)
-test_x_new = test_x_new.astype(np.float)
-
-
-#num_row = np.shape()[0]
-
-# First learner: Naive Bayesian Learner
-p_normal, p_abnormal, train_normal, train_abnormal, count1, count0 = prepare_basic_data(train_y, train_row_num, train_x)
-p1_normal, p0_normal = prepare_data_naive(p_normal, train_normal, count1)
-p1_abnormal, p0_abnormal = prepare_data_naive(p_abnormal, train_abnormal, count0)
-#print(p1_normal)
-feature_num = np.size(train_normal, 1)
+    # labels of the test data
+    test_y = test_x[:, 0]
+    test_y = test_y.astype(int)
+    test_list = list(test_y)
+    count_test_normal = test_list.count(1)
+    count_test_abnormal = test_row_num - count_test_normal
+    #print(test_y)
+    test_x_new = np.delete(test_x,0,1)
+    test_x_new = np.array(test_x_new)
+    test_x_new = test_x_new.astype(np.float)
+    return train_y, train_row_num, train_x, test_x_new, test_row_num, test_y, count_test_normal, count_test_abnormal 
 
 
-#count_normal = 0
-#count_abnormal = 0
-count_correct = 0
-true_normal = 0
-true_abnormal = 0
-predicted = list()
+# Run Naive Bayesian
+def run_naive_bayesian(train_file_name, test_file_name):
+    train_y, train_row_num, train_x, test_x_new, test_row_num, test_y, count_test_normal, count_test_abnormal = load_data(train_file_name, test_file_name)
+    p_normal, p_abnormal, train_normal, train_abnormal, count1, count0 = prepare_basic_data(train_y, train_row_num, train_x)
+    p1_normal, p0_normal = prepare_data_naive(p_normal, train_normal, count1)
+    p1_abnormal, p0_abnormal = prepare_data_naive(p_abnormal, train_abnormal, count0)
+    #print(p1_normal)
+    feature_num = np.size(train_normal, 1)
+    #count_normal = 0
+    #count_abnormal = 0
+    count_correct = 0
+    true_normal = 0
+    true_abnormal = 0
+    predicted = list()
 
-for i in range(0, test_row_num):
-    p1 = np.log(p_normal + 0.5)
-    p0 = np.log(p_abnormal + 0.5)
-    for j in range(0,feature_num):
-        if test_x_new[i][j] == 1:
-            p1 += p1_normal[j]
-            p0 += p1_abnormal[j]
-        if test_x_new[i][j] == 0:
-            p1 += p0_normal[j]
-            p0 += p0_abnormal[j]
-    
-    
-    if p1 > p0:
-       # count_normal += 1
-        predicted.append(1)
-    else:
-       # count_abnormal += 1
-        predicted.append(0)
-predicted = np.array(predicted)
+    for i in range(0, test_row_num):
+        p1 = np.log(p_normal + 0.5)
+        p0 = np.log(p_abnormal + 0.5)
+        for j in range(0,feature_num):
+            if test_x_new[i][j] == 1:
+                p1 += p1_normal[j]
+                p0 += p1_abnormal[j]
+            if test_x_new[i][j] == 0:
+                p1 += p0_normal[j]
+                p0 += p0_abnormal[j]
+        if p1 > p0:
+           # count_normal += 1
+            predicted.append(1)
+        else:
+           # count_abnormal += 1
+            predicted.append(0)
+    predicted = np.array(predicted)
 
-#print(count_normal)
-for i in range(0, test_row_num):
-    if predicted[i] == test_y[i]:
-        count_correct += 1
-    if predicted[i] == 0 and test_y[i] == 0:
-        true_abnormal += 1
-    if predicted[i] == 1 and test_y[i] == 1:
-        true_normal += 1
+    #print(count_normal)
+    for i in range(0, test_row_num):
+        if predicted[i] == test_y[i]:
+            count_correct += 1
+        if predicted[i] == 0 and test_y[i] == 0:
+            true_abnormal += 1
+        if predicted[i] == 1 and test_y[i] == 1:
+            true_normal += 1
+    return count_correct, test_row_num, true_abnormal, count_test_abnormal, true_normal, count_test_normal
 
-accuracy = round(float(count_correct)/float(test_row_num), 2)
-true_negative = round(float(true_abnormal)/float(count_test_abnormal), 2)
-true_positive = round(float(true_normal)/float(count_test_normal), 2)
-print('{}/{}({}) {}/{}({}) {}/{}({})'.format(count_correct, test_row_num, accuracy,true_abnormal,count_test_abnormal, true_negative, true_normal, count_test_normal, true_positive))
+def display_results(train_file_name, test_file_name, file_short_name):
+    count_correct, test_row_num, true_abnormal, count_test_abnormal, true_normal, count_test_normal = run_naive_bayesian(train_file_name, test_file_name)
+    accuracy = round(float(count_correct)/float(test_row_num), 2)
+    true_negative = round(float(true_abnormal)/float(count_test_abnormal), 2)
+    true_positive = round(float(true_normal)/float(count_test_normal), 2)
+    print('{} {}/{}({}) {}/{}({}) {}/{}({})'.format(file_short_name, count_correct, test_row_num, accuracy,true_abnormal,count_test_abnormal, true_negative, true_normal, count_test_normal, true_positive))
+
+
+# Part 1: Run Naive Bayesian
+display_results("spect-orig.train.csv", "spect-orig.test.csv", "orig")
+display_results("spect-resplit.train.csv", "spect-resplit.test.csv", "resplit")
+display_results("spect-itg.train.csv", "spect-itg.test.csv", "itg")
+display_results("spect-resplit-itg.train.csv", "spect-resplit-itg.test.csv", "resplit-itg")
