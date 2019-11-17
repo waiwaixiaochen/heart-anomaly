@@ -1,11 +1,5 @@
 import csv
 import numpy as np 
-#import math
-#from sklearn import preprocessing
-#from sklearn.preprocessing import StandardScaler
-#from sklearn.linear_model import LogisticRegression
-#from sklearn import metrics
-#from sklearn.metrics import confusion_matrics
 
 # preprocess the basic data for the learners
 def prepare_basic_data(train_y, train_row_num, train_x):
@@ -41,21 +35,16 @@ def prepare_data_naive(p_normal, train_normal, count1):
     # one list for p(xi=1|abnormal), one list for p(xi=0|abnormal)
     p1_normal = list()
     p0_normal = list()
-    #print(train_normal)
     feature_num = np.size(train_normal, 1)
     for i in range(0,feature_num):
         feature = train_normal[:, i] 
-        #print(feature)
         feature = feature.astype(int)
-        #print(feature)
         feature_list = list(feature)
         
-        #feature_list = np.array(feature_list)
         count_feature_1 = feature_list.count(1)
         count_feature_0 = count1 - count_feature_1 
         
         p_feature_1 = float(count_feature_1 + 0.5)/ float(count1 + 0.5)
-        #print(p_feature_1)
         p_feature_1 = np.log(p_feature_1)
         p1_normal = np.array(p1_normal)
         p1_normal = np.append(p1_normal, p_feature_1)
@@ -91,7 +80,6 @@ def load_data(train_file_name, test_file_name):
     test_row_num = 0
     train_x = list()
     test_x = list()
-    count = 0
     #train_file_name = "spect-orig.train.csv"
     # read from csv train files
     with open(train_file_name, 'r') as train_file:
@@ -120,7 +108,6 @@ def load_data(train_file_name, test_file_name):
     test_list = list(test_y)
     count_test_normal = test_list.count(1)
     count_test_abnormal = test_row_num - count_test_normal
-    #print(test_y)
     test_x_new = np.delete(test_x,0,1)
     test_x_new = np.array(test_x_new)
     test_x_new = test_x_new.astype(np.float)
@@ -133,10 +120,7 @@ def run_naive_bayesian(train_file_name, test_file_name):
     p_normal, p_abnormal, train_normal, train_abnormal, count1, count0 = prepare_basic_data(train_y, train_row_num, train_x)
     p1_normal, p0_normal = prepare_data_naive(p_normal, train_normal, count1)
     p1_abnormal, p0_abnormal = prepare_data_naive(p_abnormal, train_abnormal, count0)
-    #print(p1_normal)
     feature_num = np.size(train_normal, 1)
-    #count_normal = 0
-    #count_abnormal = 0
     count_correct = 0
     true_normal = 0
     true_abnormal = 0
@@ -153,14 +137,11 @@ def run_naive_bayesian(train_file_name, test_file_name):
                 p1 += p0_normal[j]
                 p0 += p0_abnormal[j]
         if p1 > p0:
-           # count_normal += 1
             predicted.append(1)
         else:
-           # count_abnormal += 1
             predicted.append(0)
     predicted = np.array(predicted)
 
-    #print(count_normal)
     for i in range(0, test_row_num):
         if predicted[i] == test_y[i]:
             count_correct += 1
@@ -182,14 +163,13 @@ def run_guassian(train_file_name, test_file_name):
     p_test_normal_guassian = np.sum(p_normal_log, axis = 1) + p_normal
     p_test_abnormal_guassian = np.sum(p_abnormal_log, axis = 1) + p_abnormal
     predicted = np.where((p_test_normal_guassian > p_test_abnormal_guassian), 1,0)
-    count = np.count_nonzero(predicted == 0)
     return predicted, test_y, test_x_new, test_row_num
 
 def display_results_naive(train_file_name, test_file_name, file_short_name):
     count_correct, test_row_num, true_abnormal, count_test_abnormal, true_normal, count_test_normal = run_naive_bayesian(train_file_name, test_file_name)
-    accuracy = round(float(count_correct)/float(test_row_num), 2)
-    true_negative = round(float(true_abnormal)/float(count_test_abnormal), 2)
-    true_positive = round(float(true_normal)/float(count_test_normal), 2)
+    accuracy = "%.2f" % round(float(count_correct)/float(test_row_num), 2)
+    true_negative = "%.2f" % round(float(true_abnormal)/float(count_test_abnormal), 2)
+    true_positive = "%.2f" % round(float(true_normal)/float(count_test_normal), 2)
     print('{} {}/{}({}) {}/{}({}) {}/{}({})'.format(file_short_name, count_correct, test_row_num, accuracy,true_abnormal,count_test_abnormal, true_negative, true_normal, count_test_normal, true_positive))
 
 def display_results_guassian(train_file_name, test_file_name, file_short_name):
@@ -210,9 +190,9 @@ def display_results_guassian(train_file_name, test_file_name, file_short_name):
             true_normal += 1
         if test_y[i] == 1:
             count_test_normal += 1
-    accuracy = round(float(count_correct)/float(test_row_num), 2)
-    true_negative = round(float(true_abnormal)/float(count_test_abnormal), 2)
-    true_positive = round(float(true_normal)/float(count_test_normal), 2)
+    accuracy = "%.2f" % round(float(count_correct)/float(test_row_num), 2)
+    true_negative = "%.2f" % round(float(true_abnormal)/float(count_test_abnormal), 2)
+    true_positive = "%.2f" % round(float(true_normal)/float(count_test_normal), 2)
     print('{} {}/{}({}) {}/{}({}) {}/{}({})'.format(file_short_name, count_correct, test_row_num, accuracy,true_abnormal,count_test_abnormal, true_negative, true_normal, count_test_normal, true_positive))
 
 
