@@ -1,3 +1,6 @@
+# This program is to use two different learners(Naive Bayes, Gaussian Naives Bayes)
+# to diagnose heart anomalies from radiology data
+
 import csv
 import numpy as np 
 
@@ -55,7 +58,7 @@ def prepare_data_naive(p_normal, train_normal, count1):
         p0_normal = np.append(p0_normal, p_feature_0)
     return p1_normal, p0_normal
 
-# prepare data for Guassian Naive Bayes
+# prepare data for Gaussian Naive Bayes
 def prepare_data_guassian(train_normal, train_abnormal):
     # calculate the mean for each feature
     train_normal = train_normal.astype(np.float)
@@ -151,8 +154,8 @@ def run_naive_bayesian(train_file_name, test_file_name):
             true_normal += 1
     return count_correct, test_row_num, true_abnormal, count_test_abnormal, true_normal, count_test_normal
 
-# run Guassian Naive Bayes
-def run_guassian(train_file_name, test_file_name):
+# run Gaussian Naive Bayes
+def run_gaussian(train_file_name, test_file_name):
     train_y, train_row_num, train_x, test_x_new, test_row_num, test_y, count_test_normal, count_test_abnormal = load_data(train_file_name, test_file_name)
     p_normal, p_abnormal, train_normal, train_abnormal, count1, count0 = prepare_basic_data(train_y, train_row_num, train_x)
     train_normal_mean, train_normal_std, train_abnormal_mean, train_abnormal_std = prepare_data_guassian(train_normal, train_abnormal) 
@@ -160,9 +163,9 @@ def run_guassian(train_file_name, test_file_name):
     p_abnormal_log = np.log(1/(np.sqrt(2*np.pi)*train_abnormal_std)) + (-np.square(test_x_new-train_abnormal_mean)/(2*np.square(train_abnormal_std)))
     p_normal = np.log(p_normal)
     p_abnormal = np.log(p_abnormal)
-    p_test_normal_guassian = np.sum(p_normal_log, axis = 1) + p_normal
-    p_test_abnormal_guassian = np.sum(p_abnormal_log, axis = 1) + p_abnormal
-    predicted = np.where((p_test_normal_guassian > p_test_abnormal_guassian), 1,0)
+    p_test_normal_gaussian = np.sum(p_normal_log, axis = 1) + p_normal
+    p_test_abnormal_gaussian = np.sum(p_abnormal_log, axis = 1) + p_abnormal
+    predicted = np.where((p_test_normal_gaussian > p_test_abnormal_gaussian), 1,0)
     return predicted, test_y, test_x_new, test_row_num
 
 def display_results_naive(train_file_name, test_file_name, file_short_name):
@@ -172,8 +175,8 @@ def display_results_naive(train_file_name, test_file_name, file_short_name):
     true_positive = "%.2f" % round(float(true_normal)/float(count_test_normal), 2)
     print('{} {}/{}({}) {}/{}({}) {}/{}({})'.format(file_short_name, count_correct, test_row_num, accuracy,true_abnormal,count_test_abnormal, true_negative, true_normal, count_test_normal, true_positive))
 
-def display_results_guassian(train_file_name, test_file_name, file_short_name):
-    predicted, test_y, test_x_new, test_row_num = run_guassian(train_file_name, test_file_name)
+def display_results_gaussian(train_file_name, test_file_name, file_short_name):
+    predicted, test_y, test_x_new, test_row_num = run_gaussian(train_file_name, test_file_name)
     count_correct = 0
     true_abnormal = 0
     count_test_abnormal = 0
@@ -205,10 +208,10 @@ display_results_naive("spect-itg.train.csv", "spect-itg.test.csv", "itg")
 display_results_naive("spect-resplit-itg.train.csv", "spect-resplit-itg.test.csv", "resplit-itg")
 print("\n")
 
-# Part 2: Run Guassian Naive Bayes
-print("Guassian Naive Bayes Learner:")
-display_results_guassian("spect-orig.train.csv", "spect-orig.test.csv", "orig")
-display_results_guassian("spect-resplit.train.csv", "spect-resplit.test.csv", "resplit")
-display_results_guassian("spect-itg.train.csv", "spect-itg.test.csv", "itg")
-display_results_guassian("spect-resplit-itg.train.csv", "spect-resplit-itg.test.csv", "resplit-itg")
+# Part 2: Run Gaussian Naive Bayes
+print("Gaussian Naive Bayes Learner:")
+display_results_gaussian("spect-orig.train.csv", "spect-orig.test.csv", "orig")
+display_results_gaussian("spect-resplit.train.csv", "spect-resplit.test.csv", "resplit")
+display_results_gaussian("spect-itg.train.csv", "spect-itg.test.csv", "itg")
+display_results_gaussian("spect-resplit-itg.train.csv", "spect-resplit-itg.test.csv", "resplit-itg")
 
