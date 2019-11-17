@@ -1,11 +1,11 @@
 import csv
 import numpy as np 
-import math
-from sklearn import preprocessing
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn import metrics
-from sklearn.metrics import confusion_matrics
+#import math
+#from sklearn import preprocessing
+#from sklearn.preprocessing import StandardScaler
+#from sklearn.linear_model import LogisticRegression
+#from sklearn import metrics
+#from sklearn.metrics import confusion_matrics
 
 # preprocess the basic data for the learners
 def prepare_basic_data(train_y, train_row_num, train_x):
@@ -41,8 +41,8 @@ def prepare_data_naive(p_normal, train_normal, count1):
     # one list for p(xi=1|abnormal), one list for p(xi=0|abnormal)
     p1_normal = list()
     p0_normal = list()
-    p1_normal = np.array(p1_normal)
-    p0_normal = np.array(p0_normal)
+    #p1_normal = np.array(p1_normal)
+    #p0_normal = np.array(p0_normal)
     #p1_abnormal = list()
     #p0_abnormal = list()
 
@@ -51,7 +51,7 @@ def prepare_data_naive(p_normal, train_normal, count1):
         feature = train_normal[:, i] 
         feature = train_y.astype(int)
         feature_list = list(feature)
-        feture_list = np.array(feature_list)
+        #feature_list = np.array(feature_list)
         count_feature_1 = feature_list.count(1)
         count_feature_0 = count1 - count_feature_1 
         
@@ -164,4 +164,4 @@ for i in range(0, test_row_num):
 accuracy = float(count_correct)/float(test_row_num)
 true_negative = float(true_abnormal)/float(count_abnormal)
 true_positive = float(true_normal)/float(count_normal)
-print('{}/{}({}) {}/{}({}) {}/{}({})'.format(count_correct, test_row_num, accuracy,true_abnormal,count_abnormal, true_negtive, true_normal, count_normal, true_positive))
+print('{}/{}({}) {}/{}({}) {}/{}({})'.format(count_correct, test_row_num, accuracy,true_abnormal,count_abnormal, true_negative, true_normal, count_normal, true_positive))
